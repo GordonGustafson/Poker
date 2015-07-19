@@ -29,7 +29,7 @@ def player_turn(response, game):
             player.in_pot += add
         else:
             go_all_in(player, game)
-            player.side_pot = True
+            player.all_in = True
 
     game.hand_moves.append(response)
     game.round_moves.append(response)

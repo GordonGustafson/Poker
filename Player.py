@@ -8,3 +8,6 @@ class Player:
         self.has_folded = False
         self.hand = None
         self.side_pot = 0
+        self.all_in = True
+        self.in_pot = 0
+        self.total_in_pot = 0

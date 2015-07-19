@@ -84,6 +84,10 @@ class Game:
         if number == 3:
             self.board.append() # TODO: gordon #append 1 new card
 
+        for player in self.players:
+            player.total_in_pot += player.in_pot
+            player.in_pot = 0
+
         if number != 0:
             while self.dealer != self.players[0]:
                 self.players.rotate(-1)
@@ -158,11 +162,13 @@ class Game:
         equal_dist = float(total_wealth)/len(best_players)
         count = 0
         for player in best_players:
-            if player.side_pot > 0 and player.side_pot < equal_dist:
-                player.money += player.side_pot
-                self.pot -= player.side_pot
-                best_players.remove(player)
-                count += 1
+            if player.all_in:
+                player.side_pot = self.calculate_side_pot()
+                if player.side_pot < equal_dist:
+                    player.money += player.side_pot
+                    self.pot -= player.side_pot
+                    best_players.remove(player)
+                    count += 1
 
         if count > 0:
             distribute_wealth([best_players, second_best_players])
@@ -173,3 +179,5 @@ class Game:
                 gains = get_gains(self.pot, len(best_players))
                 for i in range(len(best_players)):
                     best_players[i].money += gains
+
+    def calculate_side_bot(self):
