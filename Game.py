@@ -15,7 +15,6 @@ class Game:
     #equivilant to new game
     def __init__(self, players) :
         self.pot = 0
-        self.last_pot = 0
         self.board = None
         self.deck = None
         self.players = deque() 
@@ -35,7 +34,6 @@ class Game:
 
     def new_hand(self):
         self.pot = 0
-        self.last_pot = 0
         self.board = []
         self.deck = cards.new_shuffled_deck()
         self.hand_moves = []

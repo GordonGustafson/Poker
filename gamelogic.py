@@ -50,7 +50,7 @@ def turn(player_name, response):
     return (not player.folded)
 
 def go_all_in(player):
-    side_pot = game.last_pot + player.money * len(game.remaining_players)
+    side_pot = player.money * len(game.remaining_players)
     game.pot += player.money
     player.money = 0
     return side_pot
