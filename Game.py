@@ -74,8 +74,15 @@ class Game:
         self.last_player = self.players[0]
 
 
-    # 0:preflop 1:flop 2:turn 3:river
-    # handle dealing cards to board and setting the queue
+    """
+        Adds cards to the board depending on the round being played.
+        Round_id == 0: Pre-flop (add 0 cards)
+        Round_id == 1: Flop (add 3 cards)
+        Round_id == 2: Turn (add 1 card)
+        Round_id == 3: River (add 1 card)
+
+        Also, re-orders the queue for next round
+    """
     def round_start(self, number): 
         if number == 1:
             self.board.append() # TODO: gordon #append 3 new cards 
@@ -98,7 +105,7 @@ class Game:
 
 
     """
-    Returns the current game state to a specific player
+        Returns the current game state to a specific player
     """
     def get_game_state(self, playername):
         modified_players = self.players.copy()
@@ -131,18 +138,6 @@ class Game:
     """
     def active_hand():
         return True if sum(1 for player in self.players if not player.has_folded) > 1 else False
-
-    
-    """
-        Adds cards to the board depending on the round being played.
-        Round_id == 0: Pre-flop (add 0 cards)
-        Round_id == 1: Flop (add 3 cards)
-        Round_id == 2: Turn (add 1 card)
-        Round_id == 3: River (add 1 card)
-    """
-    def deal_cards_to_board(round_id):
-        #TODO: Gordon
-        pass
 
     
     """

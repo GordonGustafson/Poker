@@ -57,8 +57,7 @@ if __name__ == "__main__":
         game.new_hand()
         for round_id in range(4):
             if game.active_hand():
-                game.round_start(round_id)
-                game.deal_cards_to_board(round_id)    
+                game.round_start(round_id)    
                 next_player = game.players.get()
                 while next_player != game.last_player:
                     player_turn(request_player(next_player, game.get_gamestate()), game)
