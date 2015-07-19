@@ -1,5 +1,7 @@
-import json
 from Player import Player
+import cards
+
+import json
 from collections import deque
 
 class Game:
@@ -12,8 +14,8 @@ class Game:
     def __init__(self, players) :
         self.pot = 0
         self.last_pot = 0
-        self.board = []
-        self.deck = [] # TODO: gordon should this be None or a list
+        self.board = None
+        self.deck = None
         self.players = deque() 
         self.player_dict = {}
         for new_player in players.keys():
@@ -33,14 +35,15 @@ class Game:
         self.pot = 0
         self.last_pot = 0
         self.board = []
-        self.deck =  shuffle_new_deck # TODO: gordon #a fresh deck of cards
+        self.deck = cards.new_shuffled_deck()
         self.hand_moves = []
         self.round_moves = []
 
         #turning all folded players to False. Giving each player two cards
         for player in self.players:
             player.has_folded = False
-            player.hand = self.deck # TODO: gordon # give two cards to a player.
+            player.hand = self.deck[0:2] # give the player the 'top' two cards
+            self.deck   = self.deck[2:]  # the remaining cards form the new deck
         
         #cycling through players to find the dealer
         while self.dealer != self.players[0]:
@@ -89,11 +92,14 @@ class Game:
     """
     def round_start(self, number): 
         if number == 1:
-            self.board.append() # TODO: gordon #append 3 new cards 
+            self.board.extend(self.deck[0:3]) # add the top three cards to the board
+            self.deck = self.deck[3:]         # the remaining cards form the new deck
         if number == 2:
-            self.board.append() # TODO: gordon #append 1 new card
+            self.board.extend(self.deck[0:1])
+            self.deck = self.deck[1:]
         if number == 3:
-            self.board.append() # TODO: gordon #append 1 new card
+            self.board.extend(self.deck[0:1])
+            self.deck = self.deck[1:]
 
         for player in self.players:
             player.total_in_pot += player.in_pot
