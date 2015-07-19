@@ -15,10 +15,13 @@ class Game:
         self.board = []
         self.deck = [] # TODO: gordon should this be None or a list
         self.players = deque() 
+        self.player_dict = {}
         for new_player in players.keys():
-            self.players.append(Player(new_player,
-                                players[new_player]['endpoint'],
-                                players[new_player]['money']))
+            p = Player(new_player,
+                       players[new_player]['endpoint'],
+                       players[new_player]['money'])
+            self.players.append(p)
+            self.player_dict.update({new_player: p})
         self.dealer = self.players[0]
         self.hand_moves = []
         self.round_moves = []
