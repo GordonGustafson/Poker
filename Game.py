@@ -4,10 +4,12 @@ import cards
 import json
 from collections import deque
 
+SMALL_BLIND = 2
+BIG_BLIND = 4
+
 class Game:
     #constants
-    SMALL_BLIND = 2
-    BIG_BLIND = 4
+    
 
 
     #equivilant to new game
@@ -21,7 +23,7 @@ class Game:
         for new_player in players.keys():
             p = Player(new_player,
                        players[new_player]['endpoint'],
-                       players[new_player]['money'])
+                       int(players[new_player]['money']))
             self.players.append(p)
             self.player_dict.update({new_player: p})
         self.dealer = self.players[0]
