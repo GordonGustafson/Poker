@@ -37,7 +37,7 @@ class Game:
         #turning all folded players to False. Giving each player two cards
         for player in self.players:
             player.has_folded = False
-            player.hand = self.deck.two cards # TODO: gordon # give two cards to a player.
+            player.hand = self.deck # TODO: gordon # give two cards to a player.
         
         #cycling through players to find the dealer
         while self.dealer != self.players[0]:
@@ -48,7 +48,7 @@ class Game:
         self.dealer = self.players[0] 
 
         #small blind/big blind handling
-        for blind in [SMALL_BLIND, BIG_BLIND]
+        for blind in [SMALL_BLIND, BIG_BLIND]:
             self.players.rotate(-1)
             current_player = self.players[0]
             if current_player.money < blind:
@@ -110,11 +110,10 @@ class Game:
                 del player.hand
 
         gamestate = {'pot':self.pot,
-        'board':self.board,
-        'players':modified_players,
-        'dealer_index':self.dealer_index,
-        'past_moves':self.past_moves}
-
+            'board':self.board,
+            'players':modified_players,
+            'dealer_index':self.dealer_index,
+            'past_moves':self.past_moves}
         return json.dumps(gamestate) 
 
     
@@ -122,7 +121,7 @@ class Game:
         Updates the player queue to remove bankrupt players before hand begins and returns True 
         if and only if only one player is left with money.
     """
-    def last_man_standing():
+    def last_man_standing(self):
         players_to_remove = [player for player in self.players if player.money <= 0]
         for bankrupt_player in players_to_remove:
             self.players.remove(bankrupt_player)
@@ -132,7 +131,7 @@ class Game:
     """
         Returns True if and only if more than one person didn't fold.
     """
-    def active_hand():
+    def active_hand(self):
         return True if sum(1 for player in self.players if not player.has_folded) > 1 else False
 
     
@@ -140,7 +139,11 @@ class Game:
         Distributes the pot among the players according to their side_pot values and how 
         good their hand is.
     """
-    def distribute_wealth(winning_player_lists):
+    def distribute_wealth(self,winning_player_lists):
+        """
+            Returns a list of earnings for each player by arbitrarily assigning the 
+            remaining wealth when not perfectly divisible.
+        """
         def get_gains(total_wealth, num_ppl):
             surplus = total_wealth % len(best_players)
             gains = [float(total_wealth)/len(best_players)]*len(best_players)
@@ -151,13 +154,19 @@ class Game:
         best_players = winning_player_lists[0]
         second_best_players = winning_player_lists[1]
         equal_dist = float(total_wealth)/len(best_players)
+        players_to_remove = []
         count = 0
+        # Distribute wealth to players with small side_pots
         for player in best_players:
             if player.side_pot > 0 and player.side_pot < equal_dist:
                 player.money += player.side_pot
                 self.pot -= player.side_pot
-                best_players.remove(player)
+                players_to_remove.append(player)
                 count += 1
+
+        #Remove players that earned money from best_players
+        for player in players_to_remove:
+            best_players.remove(player)
 
         if count > 0:
             distribute_wealth([best_players, second_best_players])
