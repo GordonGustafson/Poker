@@ -3,27 +3,30 @@ from Player import Player
 
 class Game:
     
-    #gamestate
+    #equivilant to new game
     def __init__(self, players) :
         self.pot = 0
-        self.board = card
-        self.deck = [cards]
-        for new_player in players:
-            self.remaining_players.append(Player(new_player))
+        self.last_pot = 0
+        self.board = []
+        self.deck = shuffle_new_deck #a fresh deck of cards
+        for new_player in players.keys():
+            self.remaining_players.append(Player(new_player,
+                                                 players[new_player]['url'],
+                                                 players[new_player]['money']))
         self.dealer_index = 0
-        self.current_player_index = one after the dealer
-        self.past_moves = [all previous moves]
+        self.past_moves = []
+        self.past_round_moves = []
+        self.bet = 0
 
 
-
-
-    def hand_in_progress():
-        #checks to see if a hand is in progress
-
-
-
-    def player_move(): #takes a response from the player 
-        #modifies the game variables
+    def new_hand():
+        self.pot = 0
+        self.last_pot = 0
+        self.board = []
+        for player in self.players:
+            player.has_folded = False
+        self.dealer_index += 1
+        self.bet = 0
 
     #returns the current game state to a specific player
     def game_state(self, playername):
