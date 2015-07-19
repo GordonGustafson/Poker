@@ -10,9 +10,10 @@ class Game:
         self.board = []
         self.deck = shuffle_new_deck #a fresh deck of cards
         for new_player in players.keys():
-            self.remaining_players.append(Player(new_player,
-                                                 players[new_player]['url'],
-                                                 players[new_player]['money']))
+            self.players.append(Player(new_player,
+                                       players[new_player]['url'],
+                                       players[new_player]['money']))
+        self.current_player_index = 0
         self.dealer_index = 0
         self.past_moves = []
         self.past_round_moves = []
@@ -25,7 +26,7 @@ class Game:
         self.board = []
         for player in self.players:
             player.has_folded = False
-        self.dealer_index += 1
+        self.dealer_index += 1 
         self.bet = 0
 
     #returns the current game state to a specific player
@@ -39,7 +40,6 @@ class Game:
         'board':self.board,
         'players':modified_players,
         'dealer_index':self.dealer_index,
-        'current_player_index':self.current_player_index,
         'past_moves':self.past_moves}
 
         return json.dumps(gamestate) 
