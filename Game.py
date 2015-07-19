@@ -149,11 +149,6 @@ class Game:
         return True if sum(1 for player in self.players if not player.has_folded) > 1 else False
 
     
-    def calculate_side_bot(self):
-        #TODO
-        pass
-
-    
     """
         Distributes the pot among the players according to their side_pot values and how 
         good their hand is.
@@ -203,3 +198,5 @@ class Game:
         sidepot = 0
         for p in players:
             sidepot += min(p.total_in_pot, player.total_in_pot)
+
+        return sidepot
