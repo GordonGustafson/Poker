@@ -55,7 +55,7 @@ class Game:
         self.dealer = self.players[0] 
 
         #small blind/big blind handling
-        for blind in [Game.SMALL_BLIND, Game.BIG_BLIND]:
+        for blind in [SMALL_BLIND, BIG_BLIND]:
             self.players.rotate(-1)
             current_player = self.players[0]
             if current_player.money < blind:
@@ -76,7 +76,7 @@ class Game:
             self.round_moves.append(to_append)
 
         #setting the bet. 
-        self.bet = Game.BIG_BLIND
+        self.bet = BIG_BLIND
 
         #pointing the queue to the player after the bigblind and assigning to last_player
         self.players.rotate(-1)
@@ -102,11 +102,12 @@ class Game:
             self.board.extend(self.deck[0:1])
             self.deck = self.deck[1:]
 
-        for player in self.players:
-            player.total_in_pot += player.in_pot
-            player.in_pot = 0
 
         if number != 0:
+            for player in self.players:
+                player.total_in_pot += player.in_pot
+                player.in_pot = 0
+
             while self.dealer != self.players[0]:
                 self.players.rotate(-1)
 

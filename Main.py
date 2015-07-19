@@ -21,6 +21,9 @@ def player_turn(response, game):
 
     if not response["folded"]:
         # betting less than the current bet while having enough money
+        # game.bet is the current bet required to stay in the game;
+        # in_pot is the amount of money the player has in the pot for this
+        # round. bet - in_pot = the required amount of chips to call.
         if response["bet"] < game.bet and game.bet - player.in_pot < player.money:
             response["folded"] = True
         elif (response["bet"] - player.in_pot) < player.money:
