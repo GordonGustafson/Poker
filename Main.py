@@ -22,7 +22,7 @@ def player_turn(response, game):
         # betting less than the current bet while having enough money
         if response["bet"] < game.bet and game.bet - player.in_pot < player.money:
             response["folded"] = True
-        elif response["bet"] - player.in_pot < player.money
+        elif (response["bet"] - player.in_pot) < player.money:
             add = response["bet"] - player.in_pot
             game.pot += add
             player.money -= add
@@ -58,10 +58,10 @@ if __name__ == "__main__":
         for round_id in range(4):
             if game.active_hand():
                 game.round_start(round_id)    
-                next_player = game.players.get()
+                next_player = game.players.pop_left()
                 while next_player != game.last_player:
                     player_turn(request_player(next_player, game.get_gamestate()), game)
-                    game.players.put(next_player)
+                    game.players.append(next_player)
             else:
                 break
         game.distribute_wealth(game.evaluate_hands())
