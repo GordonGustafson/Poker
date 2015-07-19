@@ -1,6 +1,6 @@
 import requests
 import json
 
-r = requests.post('http://10.16.1.185:5000/bot', data=json.dumps({"name":"lukas"}))
+r = requests.post('http://10.0.18.18:5000/bot', data={"bullshit":"sucks"})
 
-print r
+print r.json()
