@@ -128,7 +128,7 @@ class Game:
             'players':modified_players,
             'dealer_index':self.dealer_index,
             'past_moves':self.past_moves}
-        return json.dumps(gamestate) 
+        return gamestate 
 
     
     """
