@@ -4,7 +4,7 @@ import argparse
 import Game
 
 def request_player(player, gamestate):
-    r = requests.post(player.endpoint, data=gamestate)
+    r = requests.post(player.endpoint, data=json.dump(gamestate))
     if r.headers['Content-Type'] != 'application/json':
         return {'name': player.name, 'fold': True, 'bet':0}
     else:
