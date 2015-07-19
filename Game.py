@@ -81,16 +81,15 @@ class Game:
         self.last_player = self.players[0]
 
 
-    """
-        Adds cards to the board depending on the round being played.
+    def round_start(self, number): 
+        """Adds cards to the board depending on the round being played.
         Round_id == 0: Pre-flop (add 0 cards)
         Round_id == 1: Flop (add 3 cards)
         Round_id == 2: Turn (add 1 card)
         Round_id == 3: River (add 1 card)
 
         Also, re-orders the queue for next round
-    """
-    def round_start(self, number): 
+        """
         if number == 1:
             self.board.extend(self.deck[0:3]) # add the top three cards to the board
             self.deck = self.deck[3:]         # the remaining cards form the new deck
@@ -114,10 +113,8 @@ class Game:
             self.last_player = self.players[0]
 
 
-    """
-        Returns the current game state to a specific player
-    """
     def get_game_state(self, playername):
+        """Returns the current game state to a specific player"""
         modified_players = self.players.copy()
         for player in modified_players:
             if player.name != playername:
@@ -131,21 +128,18 @@ class Game:
         return gamestate 
 
     
-    """
-        Updates the player queue to remove bankrupt players before hand begins and returns True 
-        if and only if only one player is left with money.
-    """
     def last_man_standing(self):
+        """Updates the player queue to remove bankrupt players before hand begins and returns True
+        if and only if only one player is left with money.
+        """
         players_to_remove = [player for player in self.players if player.money <= 0]
         for bankrupt_player in players_to_remove:
             self.players.remove(bankrupt_player)
         return (False if len(self.players) > 1 else True)
 
     
-    """
-        Returns True if and only if more than one person didn't fold.
-    """
     def active_hand(self):
+        """Returns True if and only if more than one person didn't fold."""
         return True if sum(1 for player in self.players if not player.has_folded) > 1 else False
 
     
@@ -154,16 +148,14 @@ class Game:
         pass
 
     
-    """
-        Distributes the pot among the players according to their side_pot values and how 
-        good their hand is.
-    """
     def distribute_wealth(self,winning_player_lists):
-        """
-            Returns a list of earnings for each player by arbitrarily assigning the 
-            remaining wealth when not perfectly divisible.
+        """Distributes the pot among the players according to their side_pot
+        values and how good their hand is.
         """
         def get_gains(total_wealth, num_ppl):
+            """Returns a list of earnings for each player by arbitrarily assigning the
+            remaining wealth when not perfectly divisible.
+            """
             surplus = total_wealth % len(best_players)
             gains = [float(total_wealth)/len(best_players)]*len(best_players)
             for i in range(surplus):
