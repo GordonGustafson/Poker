@@ -1,4 +1,4 @@
-
+import json
 from Player import Player
 
 class Game:
@@ -25,5 +25,18 @@ class Game:
     def player_move(): #takes a response from the player 
         #modifies the game variables
 
-    def game_state():
-        #packages variables and returns the current game state
+    #returns the current game state to a specific player
+    def game_state(self, playername):
+        modified_players = self.players.copy()
+        for player in modified_players:
+            if player.name != playername:
+                del player.hand
+
+        gamestate = {'pot':self.pot,
+        'board':self.board,
+        'players':modified_players,
+        'dealer_index':self.dealer_index,
+        'current_player_index':self.current_player_index,
+        'past_moves':self.past_moves}
+
+        return json.dumps(gamestate) 
