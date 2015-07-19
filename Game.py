@@ -91,6 +91,10 @@ class Game:
         if number == 3:
             self.board.append() # TODO: gordon #append 1 new card
 
+        for player in self.players:
+            player.total_in_pot += player.in_pot
+            player.in_pot = 0
+
         if number != 0:
             while self.dealer != self.players[0]:
                 self.players.rotate(-1)
@@ -135,6 +139,11 @@ class Game:
         return True if sum(1 for player in self.players if not player.has_folded) > 1 else False
 
     
+    def calculate_side_bot(self):
+        #TODO
+        pass
+
+    
     """
         Distributes the pot among the players according to their side_pot values and how 
         good their hand is.
@@ -158,11 +167,13 @@ class Game:
         count = 0
         # Distribute wealth to players with small side_pots
         for player in best_players:
-            if player.side_pot > 0 and player.side_pot < equal_dist:
-                player.money += player.side_pot
-                self.pot -= player.side_pot
-                players_to_remove.append(player)
-                count += 1
+            if player.all_in:
+                player.side_pot = self.calculate_side_pot()
+                if player.side_pot < equal_dist:
+                    player.money += player.side_pot
+                    self.pot -= player.side_pot
+                    players_to_remove.append(player)
+                    count += 1
 
         #Remove players that earned money from best_players
         for player in players_to_remove:
