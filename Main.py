@@ -1,7 +1,7 @@
 import requests 
 import json
 import argparse
-# import Game
+import Game
 
 def request_player(player, gamestate):
     r = requests.post(player.endpoint, data=gamestate)

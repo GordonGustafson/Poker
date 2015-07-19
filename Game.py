@@ -27,7 +27,7 @@ class Game:
         self.bet = 0
         self.last_player = None
 
-    def new_hand():
+    def new_hand(self):
         self.pot = 0
         self.last_pot = 0
         self.board = []
@@ -73,6 +73,9 @@ class Game:
         #pointing the queue to the player after the bigblind and assigning to last_player
         self.players.rotate(-1)
         self.last_player = self.players[0]
+
+    def 
+
 
     #returns the current game state to a specific player
     def get_game_state(self, playername):
