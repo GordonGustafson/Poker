@@ -15,6 +15,33 @@ def request_player(player, gamestate):
 def player_info_tuple(s):
     return tuple(s.split(','))
 
+def player_turn(response, game):
+    player = game.players_dict[response["name"]]
+
+    if not response["folded"]:
+        # betting less than the current bet while having enough money
+        if response["bet"] < game.bet and game.bet - player.in_pot < player.money:
+            response["folded"] = True
+        elif response["bet"] - player.in_pot < player.money
+            add = response["bet"] - player.in_pot
+            game.pot += add
+            player.money -= add
+            player.in_pot += add
+        else:
+            go_all_in(player, game)
+            player.side_pot = True
+
+    game.hand_moves.append(response)
+    game.round_moves.append(response)
+
+    return not response["folded"]
+
+def go_all_in(player, game):
+    game.pot += player.money
+    player.in_pot += player.money
+    player.money = 0
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -34,11 +61,12 @@ if __name__ == "__main__":
                 game.deal_cards_to_board(round_id)    
                 next_player = game.players.get()
                 while next_player != game.last_player:
-                    player_turn(player, request_player(player, game.get_gamestate()))
+                    player_turn(request_player(next_player, game.get_gamestate()), game)
                     game.players.put(next_player)
             else:
                 break
         game.distribute_wealth(game.evaluate_hands())
+
 
 
 
