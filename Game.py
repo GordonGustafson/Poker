@@ -74,8 +74,23 @@ class Game:
         self.players.rotate(-1)
         self.last_player = self.players[0]
 
-    def 
+    # 0:preflop 1:flop 2:turn 3:river
+    # handle dealing cards to board and setting the queue
+    def round_start(self, number): 
+        if number == 1:
+            self.board.append() # TODO: gordon #append 3 new cards 
+        if number == 2:
+            self.board.append() # TODO: gordon #append 1 new card
+        if number == 3:
+            self.board.append() # TODO: gordon #append 1 new card
 
+        if number != 0:
+            while self.dealer != self.players[0]:
+                self.players.rotate(-1)
+
+            #point the queue to the small blind.
+            self.players.rotate(-1)
+            self.last_player = self.players[0]
 
     #returns the current game state to a specific player
     def get_game_state(self, playername):
