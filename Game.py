@@ -30,7 +30,7 @@ class Game:
         self.bet = 0
 
     #returns the current game state to a specific player
-    def game_state(self, playername):
+    def get_game_state(self, playername):
         modified_players = self.players.copy()
         for player in modified_players:
             if player.name != playername:
