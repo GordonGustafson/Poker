@@ -56,7 +56,7 @@ class Game:
         self.dealer = self.players[0] 
 
         #small blind/big blind handling
-        for blind in [SMALL_BLIND, BIG_BLIND]:
+        for blind in [Game.SMALL_BLIND, Game.BIG_BLIND]:
             self.players.rotate(-1)
             current_player = self.players[0]
             if current_player.money < blind:
@@ -76,7 +76,7 @@ class Game:
             self.round_moves.append(to_append)
 
         #setting the bet. 
-        self.bet = BIG_BLIND
+        self.bet = Game.BIG_BLIND
 
         #pointing the queue to the player after the bigblind and assigning to last_player
         self.players.rotate(-1)
@@ -145,6 +145,15 @@ class Game:
         return True if sum(1 for player in self.players if not player.has_folded) > 1 else False
 
     
+
+    def calculate_side_pot(self, player):
+        sidepot = 0
+        for p in players:
+            sidepot += min(p.total_in_pot, player.total_in_pot)
+
+        return sidepot
+
+
     """
         Distributes the pot among the players according to their side_pot values and how 
         good their hand is.
@@ -192,9 +201,4 @@ class Game:
                 for i in range(len(best_players)):
                     best_players[i].money += gains
 
-    def calculate_side_pot(self, player):
-        sidepot = 0
-        for p in players:
-            sidepot += min(p.total_in_pot, player.total_in_pot)
 
-        return sidepot
