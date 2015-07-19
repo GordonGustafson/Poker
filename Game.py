@@ -1,6 +1,7 @@
 from Player import Player
 import cards
 
+import copy
 import json
 from collections import deque
 
@@ -64,6 +65,7 @@ class Game:
                 bet = current_player.money
                 current_player.money = 0
             else: 
+                current_player.in_pot += blind
                 bet = blind
                 self.pot += blind
                 current_player.money -= blind
@@ -113,18 +115,18 @@ class Game:
             self.last_player = self.players[0]
 
 
-    def get_game_state(self, playername):
+    def get_gamestate(self, playername):
         """Returns the current game state to a specific player"""
-        modified_players = self.players.copy()
+        modified_players = copy.copy(self.players)
         for player in modified_players:
             if player.name != playername:
                 del player.hand
 
         gamestate = {'pot':self.pot,
             'board':self.board,
-            'players':modified_players,
-            'dealer_index':self.dealer_index,
-            'past_moves':self.past_moves}
+            'players': [player.name for player in modified_players],
+            'dealer':self.dealer.name,
+            'past_moves':self.round_moves}
         return gamestate 
 
     

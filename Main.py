@@ -4,6 +4,7 @@ import argparse
 from Game import Game
 
 def request_player(player, gamestate):
+    print gamestate
     r = requests.post(player.endpoint, data=gamestate)
     if r.headers['Content-Type'] != 'application/json':
         return {'name': player.name, 'fold': True, 'bet':0}
@@ -16,7 +17,7 @@ def player_info_tuple(s):
     return tuple(s.split(','))
 
 def player_turn(response, game):
-    player = game.players_dict[response["name"]]
+    player = game.player_dict[response["name"]]
 
     if not response["folded"]:
         # betting less than the current bet while having enough money
@@ -60,10 +61,14 @@ if __name__ == "__main__":
             if game.active_hand():
                 game.round_start(round_id)    
                 next_player = game.players.popleft()
+                player_turn(request_player(next_player, game.get_gamestate(next_player)), game)
+                game.players.append(next_player)
+                next_player = game.players.popleft()
                 while next_player != game.last_player:
                     print "YOOOO"
-                    player_turn(request_player(next_player, game.get_gamestate()), game)
+                    player_turn(request_player(next_player, game.get_gamestate(next_player)), game)
                     game.players.append(next_player)
+                    next_player = game.players.popleft()
             else:
                 break
         game.distribute_wealth(game.evaluate_hands())
