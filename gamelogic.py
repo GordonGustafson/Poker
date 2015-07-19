@@ -1,26 +1,53 @@
-import requests
+def turn(player_name, response):
+    player = game.players_dict[player_name]
 
-def startGame():
-    
+    if response["action"] == "check":
+        if game.bet == 0:
+            pass
+        else:
+            player.folded = True
+            response["action"] = "fold"
 
-def gameLoop():
-    
+    elif response["action"] == "call":
+        # check if player can afford it
+        if game.bet - player.in_pot - player.money >= 0:
+            call = game.bet - player.in_pot
+            game.pot += call
+            player.money -= call
+            player.in_pot += call
+        else:
+            response["action"] = "all in"
+            player.side_pot = go_all_in(player)
 
+    elif response["action"] == "raise":
+        # check if player can afford it
+        rays = response["bet"] - player.in_pot
+        if rays - player.in_pot - player.money >= 0:
+            pot += rays
+            bet = rays
+            player.money -= rays
+            player.in_pot += rays
 
-def turn(player):
-    game = getGame()
-
-    state = get_game_state(game)
-    res = requests.get(player.endpoint, state).json()
-
-    if res["action"] == "fold":
-        player.folded = True
+            game.last_player = player
+        else:
+            response["action"] == "all in"
+            player.side_pot = go_all_in(player)
 
     else:
-        last_bet = game.get_last_bet()
+        player.folded = True
+        response["action"] = "fold"
 
-        if res["action"] == "check":
-            #stuff
+    move = {"name": player_name, "action": response["action"]}
+    if "bet" in response:
+        move.update({"bet": bet})
 
-        elif res["action"] == "call":
-            # 
+    game.hand_moves.append(move)
+    game.round_moves.append(move)
+
+    return (not player.folded)
+
+def go_all_in(player):
+    side_pot = game.last_pot + player.money * len(game.remaining_players)
+    game.pot += player.money
+    player.money = 0
+    return side_pot
