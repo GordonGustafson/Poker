@@ -1,3 +1,6 @@
+import Game
+import Player
+
 def turn(player_name, response):
     player = game.players_dict[player_name]
 
@@ -38,7 +41,7 @@ def turn(player_name, response):
         response["action"] = "fold"
 
     move = {"name": player_name, "action": response["action"]}
-    if "bet" in response:
+    if response["action"] == "raise":
         move.update({"bet": bet})
 
     game.hand_moves.append(move)
