@@ -52,13 +52,14 @@ class Game:
             self.players.rotate(-1)
             current_player = self.players[0]
             if current_player.money < blind:
-                current_player.side_pot = current_player.money * self.players.count()
-                game.pot += current_player.money
+                current_player.in_pot += current_player.money
+                current_player.all_in = True
+                self.pot += current_player.money
                 bet = current_player.money
                 current_player.money = 0
             else: 
                 bet = blind
-                game.pot += blind
+                self.pot += blind
                 current_player.money -= blind
 
             #storing the changes to big/small blind
@@ -158,7 +159,7 @@ class Game:
         count = 0
         for player in best_players:
             if player.all_in:
-                player.side_pot = self.calculate_side_pot()
+                player.side_pot = self.calculate_side_pot(player)
                 if player.side_pot < equal_dist:
                     player.money += player.side_pot
                     self.pot -= player.side_pot
@@ -175,4 +176,7 @@ class Game:
                 for i in range(len(best_players)):
                     best_players[i].money += gains
 
-    def calculate_side_bot(self):
+    def calculate_side_pot(self, player):
+        sidepot = 0
+        for p in players:
+            sidepot += min(p.total_in_pot, player.total_in_pot)
