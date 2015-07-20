@@ -83,15 +83,23 @@ class FiveCardHandsTest(unittest.TestCase):
 
 class HoldemHandsTest(unittest.TestCase):
     def assert_value_equals(self, community_string, hand_string, expected_value):
-        community = parse_hand(community_string)
-        hand      = parse_hand(hand_string)
-        value = holdem_hand_value(community, hand)
+        community_cards = parse_hand(community_string)
+        hand = parse_hand(hand_string)
+        value = holdem_hand_value(community_cards, hand)
         self.assertEqual(value, expected_value)
 
     def assert_comparator_result_equals(self, left_hand_string, right_hand_string, comparator, expected_value):
         left_hand  = parse_hand(left_hand_string)
         right_hand = parse_hand(right_hand_string)
         self.assertEqual( comparator(left_hand, right_hand), expected_value)
+
+    def assert_best_holdem_hands_equals(self, community_cards_string, hand_strings, expected_hand_strings):
+        community_cards = parse_hand(community_cards_string)
+        hands          = [parse_hand(hand_string) for hand_string in hand_strings]
+        expected_hands = [parse_hand(hand_string) for hand_string in expected_hand_strings]
+        best_hands = best_holdem_hands(community_cards, hands)
+        # don't consider ordering when comparing the results:
+        self.assertEqual(sorted(best_hands), sorted(expected_hands))
 
     def test_hand_values(self):
         self.assert_value_equals("TC 9D 6H 3S 2C", "AC KC", [HandType.HIGH_CARD,       14, 13, 10, 9, 6])
@@ -115,3 +123,8 @@ class HoldemHandsTest(unittest.TestCase):
         self.assert_comparator_result_equals("7S 8D", "4D 5D", comparator, 1)
         self.assert_comparator_result_equals("7S 8D", "AC 4C", comparator, -1)
         self.assert_comparator_result_equals("7C 8C", "AC 4C", comparator, 1)
+
+    def test_best_holdem_hands(self):
+        self.assert_best_holdem_hands_equals("TC 9C 6C 3S 2H", ["AS 4D", "KS 5D", "2S 4D", "3D 5H"], ["3D 5H"])
+        self.assert_best_holdem_hands_equals("TC 9C 6C 3S 2H", ["TH 4D", "3D 2D", "TS TD", "3D 5D"], ["TS TD"])
+        self.assert_best_holdem_hands_equals("TC 9C 6C 3S 2H", ["TH 9D", "TS 9H", "3D 2D", "3D 5D"], ["TH 9D", "TS 9H"])

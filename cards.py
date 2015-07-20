@@ -137,3 +137,15 @@ def get_holdem_hand_comparator(community_cards):
     """Takes the community cards as an argument and returns a comparator that
     determines which of two two-card hands is better"""
     return lambda left, right: compare_holdem_hands(community_cards, left, right)
+
+
+def best_holdem_hands(community_cards, hands):
+    """Returns all the hands in that are tied for 'first place'"""
+    if len(hands) in [0, 1]:
+        return hands
+    comparator = get_holdem_hand_comparator(community_cards)
+    descending_hands = sorted(hands, cmp=comparator, reverse=True)
+    if comparator(descending_hands[0], descending_hands[1]) == 0:
+        return [descending_hands[0]] + best_holdem_hands(community_cards, descending_hands[1:])
+    else:
+        return [descending_hands[0]]
