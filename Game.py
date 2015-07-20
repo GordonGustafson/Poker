@@ -131,12 +131,12 @@ class Game:
         players_to_remove = [player for player in self.players if player.money <= 0]
         for bankrupt_player in players_to_remove:
             self.players.remove(bankrupt_player)
-        return (False if len(self.players) > 1 else True)
+        return len(self.players) <= 1
 
 
     def active_hand(self):
         """Returns True if and only if more than one person didn't fold."""
-        return True if sum(1 for player in self.players if not player.has_folded) > 1 else False
+        return sum(1 for player in self.players if not player.has_folded) > 1
 
 
 
