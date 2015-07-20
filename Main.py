@@ -1,4 +1,4 @@
-import requests 
+import requests
 import json
 import argparse
 from Game import Game
@@ -57,12 +57,12 @@ if __name__ == "__main__":
         player_info[p[0]] = {'endpoint':p[1], 'money':p[2]}
 
     game = Game(player_info)
-    print "last {}".format(game.last_man_standing()) 
+    print "last {}".format(game.last_man_standing())
     while not game.last_man_standing():
         game.new_hand()
         for round_id in range(4):
             if game.active_hand():
-                game.round_start(round_id)    
+                game.round_start(round_id)
                 next_player = game.players.popleft()
                 player_turn(request_player(next_player, game.get_gamestate(next_player)), game)
                 game.players.append(next_player)
@@ -75,10 +75,3 @@ if __name__ == "__main__":
             else:
                 break
         game.distribute_wealth(game.evaluate_hands())
-
-
-
-
-
-
-

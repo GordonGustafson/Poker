@@ -9,13 +9,8 @@ SMALL_BLIND = 2
 BIG_BLIND = 4
 
 class Game:
-    #constants
-    
-
-
-    #equivilant to new game
     def __init__(self, players) :
-        self.players = deque() 
+        self.players = deque()
         self.player_dict = {}
         for new_player in players.keys():
             p = Player(new_player,
@@ -40,14 +35,14 @@ class Game:
             player.has_folded = False
             player.hand = self.deck[0:2] # give the player the 'top' two cards
             self.deck   = self.deck[2:]  # the remaining cards form the new deck
-        
+
         #cycling through players to find the dealer
         while self.dealer != self.players[0]:
             self.players.rotate(-1)
 
         #setting the dealer to the player after the previous dealer
         self.players.rotate(-1)
-        self.dealer = self.players[0] 
+        self.dealer = self.players[0]
 
         #small blind/big blind handling
         for blind in [SMALL_BLIND, BIG_BLIND]:
@@ -59,7 +54,7 @@ class Game:
                 self.pot += current_player.money
                 bet = current_player.money
                 current_player.money = 0
-            else: 
+            else:
                 current_player.in_pot += blind
                 bet = blind
                 self.pot += blind
@@ -70,7 +65,7 @@ class Game:
             self.hand_moves.append(to_append)
             self.round_moves.append(to_append)
 
-        #setting the bet. 
+        #setting the bet.
         self.bet = BIG_BLIND
 
         #pointing the queue to the player after the bigblind and assigning to last_player
@@ -78,7 +73,7 @@ class Game:
         self.last_player = self.players[0]
 
 
-    def round_start(self, number): 
+    def round_start(self, number):
         """Adds cards to the board depending on the round being played.
         Round_id == 0: Pre-flop (add 0 cards)
         Round_id == 1: Flop (add 3 cards)
@@ -123,9 +118,9 @@ class Game:
             'players': [player.name for player in modified_players],
             'dealer':self.dealer.name,
             'past_moves':self.round_moves}
-        return gamestate 
+        return gamestate
 
-    
+
     def last_man_standing(self):
         """Updates the player queue to remove bankrupt players before hand begins and returns True
         if and only if only one player is left with money.
@@ -135,12 +130,12 @@ class Game:
             self.players.remove(bankrupt_player)
         return (False if len(self.players) > 1 else True)
 
-    
+
     def active_hand(self):
         """Returns True if and only if more than one person didn't fold."""
         return True if sum(1 for player in self.players if not player.has_folded) > 1 else False
 
-    
+
 
     def calculate_side_pot(self, player):
         sidepot = 0
@@ -151,7 +146,7 @@ class Game:
 
 
     """
-        Distributes the pot among the players according to their side_pot values and how 
+        Distributes the pot among the players according to their side_pot values and how
         good their hand is.
     """
     def distribute_wealth(self,winning_player_lists):
@@ -196,5 +191,3 @@ class Game:
                 gains = get_gains(self.pot, len(best_players))
                 for i in range(len(best_players)):
                     best_players[i].money += gains
-
-

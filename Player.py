@@ -1,9 +1,7 @@
-
-
 class Player:
     def __init__(self, name, endpoint, money):
         self.name = name
-        self.endpoint = endpoint  
+        self.endpoint = endpoint
         self.money = money
         self.has_folded = False
         self.hand = None
