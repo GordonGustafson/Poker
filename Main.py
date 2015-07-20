@@ -66,8 +66,7 @@ if __name__ == "__main__":
         game.new_hand()
         for round_type in [RoundType.PRE_FLOP, RoundType.FLOP, RoundType.TURN, RoundType.RIVER]:
             if game.active_hand():
-                game.round_start(round_type)
-                print "ROUND %s" % (round_type)   
+                game.round_start(round_type)   
                 next_player = game.players.popleft()
                 game.players.append(next_player)
                 player_turn(request_player(next_player, game.get_gamestate(next_player)), game)
