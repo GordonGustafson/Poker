@@ -8,6 +8,14 @@ from collections import deque
 SMALL_BLIND = 2
 BIG_BLIND = 4
 
+# The closest we can get to an Enum in python 2.7
+class RoundType():
+    PRE_FLOP = object()
+    FLOP = object()
+    TURN = object()
+    RIVER = object()
+
+
 class Game:
     def __init__(self, players) :
         self.players = deque()
@@ -73,27 +81,22 @@ class Game:
         self.last_player = self.players[0]
 
 
-    def round_start(self, number):
+    def round_start(self, round_type):
         """Adds cards to the board depending on the round being played.
-        Round_id == 0: Pre-flop (add 0 cards)
-        Round_id == 1: Flop (add 3 cards)
-        Round_id == 2: Turn (add 1 card)
-        Round_id == 3: River (add 1 card)
-
         Also, re-orders the queue for next round
         """
-        if number == 1:
+        if round_type == RoundType.FLOP:
             self.board.extend(self.deck[0:3]) # add the top three cards to the board
             self.deck = self.deck[3:]         # the remaining cards form the new deck
-        if number == 2:
+        if round_type == RoundType.TURN:
             self.board.extend(self.deck[0:1])
             self.deck = self.deck[1:]
-        if number == 3:
+        if round_type == RoundType.RIVER:
             self.board.extend(self.deck[0:1])
             self.deck = self.deck[1:]
 
 
-        if number != 0:
+        if round_type != RoundType.PRE_FLOP:
             for player in self.players:
                 player.total_in_pot += player.in_pot
                 player.in_pot = 0

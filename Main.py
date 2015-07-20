@@ -1,7 +1,7 @@
 import requests
 import json
 import argparse
-from Game import Game
+from Game import Game, RoundType
 
 def request_player(player, gamestate):
     print gamestate
@@ -61,9 +61,9 @@ if __name__ == "__main__":
     print "last {}".format(game.last_man_standing())
     while not game.last_man_standing():
         game.new_hand()
-        for round_id in range(4):
+        for round_type in [RoundType.PRE_FLOP, RoundType.FLOP, RoundType.TURN, RoundType.RIVER]:
             if game.active_hand():
-                game.round_start(round_id)
+                game.round_start(round_type)
                 next_player = game.players.popleft()
                 game.players.append(next_player)
                 player_turn(request_player(next_player, game.get_gamestate(next_player)), game)
