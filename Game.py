@@ -15,9 +15,6 @@ class Game:
 
     #equivilant to new game
     def __init__(self, players) :
-        self.pot = 0
-        self.board = None
-        self.deck = None
         self.players = deque() 
         self.player_dict = {}
         for new_player in players.keys():
@@ -27,10 +24,6 @@ class Game:
             self.players.append(p)
             self.player_dict.update({new_player: p})
         self.dealer = self.players[0]
-        self.hand_moves = []
-        self.round_moves = []
-        self.bet = 0
-        self.last_player = None
 
 
     def new_hand(self):
@@ -39,6 +32,8 @@ class Game:
         self.deck = cards.new_shuffled_deck()
         self.hand_moves = []
         self.round_moves = []
+        self.bet = 0
+        self.last_player = None
 
         #turning all folded players to False. Giving each player two cards
         for player in self.players:
