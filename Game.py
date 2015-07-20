@@ -106,16 +106,13 @@ class Game:
             self.last_player = self.players[0]
 
 
-    def get_gamestate(self, playername):
+    def get_gamestate(self, player):
         """Returns the current game state to a specific player"""
-        modified_players = copy.copy(self.players)
-        for player in modified_players:
-            if player.name != playername:
-                del player.hand
 
         gamestate = {'pot':self.pot,
             'board':self.board,
-            'players': [player.name for player in modified_players],
+            'players': [player.name for player in self.players],
+            'hand': player.hand,
             'dealer':self.dealer.name,
             'past_moves':self.round_moves}
         return gamestate

@@ -5,7 +5,8 @@ from Game import Game
 
 def request_player(player, gamestate):
     print gamestate
-    r = requests.post(player.endpoint, data=gamestate)
+    headers = {"content-type": "application/json"}
+    r = requests.post(player.endpoint, data=json.dumps(gamestate), headers=headers)
     if r.headers['Content-Type'] != 'application/json':
         return {'name': player.name, 'fold': True, 'bet':0}
     else:
@@ -64,14 +65,15 @@ if __name__ == "__main__":
             if game.active_hand():
                 game.round_start(round_id)
                 next_player = game.players.popleft()
-                player_turn(request_player(next_player, game.get_gamestate(next_player)), game)
                 game.players.append(next_player)
+                player_turn(request_player(next_player, game.get_gamestate(next_player)), game)
                 next_player = game.players.popleft()
+                game.players.append(next_player)
                 while next_player != game.last_player:
                     print "YOOOO"
                     player_turn(request_player(next_player, game.get_gamestate(next_player)), game)
-                    game.players.append(next_player)
                     next_player = game.players.popleft()
+                    game.players.append(next_player)
             else:
                 break
         game.distribute_wealth(game.evaluate_hands())
