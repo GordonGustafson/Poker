@@ -20,6 +20,9 @@ def player_info_tuple(s):
 def player_turn(response, game):
     player = game.player_dict[response["name"]]
 
+    if player.money == 0:
+        return
+
     if not response["folded"]:
         # betting less than the current bet while having enough money
         # game.bet is the current bet required to stay in the game;
@@ -32,6 +35,7 @@ def player_turn(response, game):
             game.pot += add
             player.money -= add
             player.in_pot += add
+            player.total_in_pot += add
         else:
             go_all_in(player, game)
             player.all_in = True
@@ -39,11 +43,10 @@ def player_turn(response, game):
     game.hand_moves.append(response)
     game.round_moves.append(response)
 
-    return not response["folded"]
-
 def go_all_in(player, game):
     game.pot += player.money
     player.in_pot += player.money
+    player.total_in_pot += player.money
     player.money = 0
 
 
@@ -64,13 +67,13 @@ if __name__ == "__main__":
         for round_type in [RoundType.PRE_FLOP, RoundType.FLOP, RoundType.TURN, RoundType.RIVER]:
             if game.active_hand():
                 game.round_start(round_type)
+                print "ROUND %s" % (round_type)   
                 next_player = game.players.popleft()
                 game.players.append(next_player)
                 player_turn(request_player(next_player, game.get_gamestate(next_player)), game)
                 next_player = game.players.popleft()
                 game.players.append(next_player)
                 while next_player != game.last_player:
-                    print "YOOOO"
                     player_turn(request_player(next_player, game.get_gamestate(next_player)), game)
                     next_player = game.players.popleft()
                     game.players.append(next_player)
@@ -78,7 +81,7 @@ if __name__ == "__main__":
                 break
         game.distribute_wealth()
 
-
+    print "%s wins!" % game.players[0].name
 
 
 

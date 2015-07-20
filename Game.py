@@ -40,6 +40,8 @@ class Game:
 
         #turning all folded players to False. Giving each player two cards
         for player in self.players:
+            player.in_pot = 0
+            player.total_in_pot = 0
             player.has_folded = False
             player.hand = self.deck[0:2] # give the player the 'top' two cards
             self.deck   = self.deck[2:]  # the remaining cards form the new deck
@@ -116,6 +118,7 @@ class Game:
             'board':self.board,
             'players': [player.name for player in self.players],
             'hand': player.hand,
+            'money': player.money,
             'dealer':self.dealer.name,
             'past_moves':self.round_moves}
         return gamestate
@@ -139,7 +142,7 @@ class Game:
 
     def calculate_side_pot(self, player):
         sidepot = 0
-        for p in players:
+        for p in self.players:
             sidepot += min(p.total_in_pot, player.total_in_pot)
 
         return sidepot
@@ -158,7 +161,7 @@ class Game:
             remaining wealth when not perfectly divisible.
             """
             surplus = total_wealth % len(best_players)
-            gains = [float(total_wealth)/len(best_players)]*len(best_players)
+            gains = [total_wealth / len(best_players)]*len(best_players)
             for i in range(surplus):
                 gains[i] += 1
             return gains
@@ -166,9 +169,9 @@ class Game:
 	player_list = [player for player in self.players]
 
         while self.pot > 0:
-            best_players = cards.best_holdem_hands(self.board, player_list)
+            best_players = cards.players_with_best_holdem_hands(self.board, player_list)
 
-            equal_dist = float(total_wealth)/len(best_players)
+            equal_dist = float(self.pot)/len(best_players)
             players_to_remove = []
             count = 0
             # Distribute wealth to players with small side_pots
@@ -195,4 +198,4 @@ class Game:
                     gains = get_gains(self.pot, len(best_players))
                     for i in range(len(best_players)):
                         best_players[i].money += gains[i]
-                        pot -= gains[i]
+                        self.pot -= gains[i]
