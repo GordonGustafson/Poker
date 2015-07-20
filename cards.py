@@ -130,4 +130,5 @@ def holdem_hand_value(community_cards, hand):
 
 
 def compare_holdem_hands(community_cards, left, right):
-    cmp( holdem_hand_value(left), holdem_hand_value(right) )
+    return cmp( holdem_hand_value(community_cards, left), holdem_hand_value(community_cards, right) )
+
