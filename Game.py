@@ -149,7 +149,7 @@ class Game:
         Distributes the pot among the players according to their side_pot values and how
         good their hand is.
     """
-    def distribute_wealth(self,winning_player_lists):
+    def distribute_wealth(self):
         """Distributes the pot among the players according to their side_pot
         values and how good their hand is.
         """
@@ -163,31 +163,38 @@ class Game:
                 gains[i] += 1
             return gains
 
-        best_players = winning_player_lists[0]
-        second_best_players = winning_player_lists[1]
-        equal_dist = float(total_wealth)/len(best_players)
-        players_to_remove = []
-        count = 0
-        # Distribute wealth to players with small side_pots
-        for player in best_players:
-            if player.all_in:
-                player.side_pot = self.calculate_side_pot(player)
-                if player.side_pot < equal_dist:
-                    player.money += player.side_pot
-                    self.pot -= player.side_pot
-                    players_to_remove.append(player)
-                    count += 1
+        hands_dict = {player.hand: player for player in self.players}
+        hands = [player.hand for player in self.players]
 
-        #Remove players that earned money from best_players
-        for player in players_to_remove:
-            best_players.remove(player)
+        while self.pot > 0:
+            best_hands = cards.best_holdem_hands(self.board, hands)
 
-        if count > 0:
-            distribute_wealth([best_players, second_best_players])
-        else:
-            if len(best_players) == 0 and self.pot > 0:
-                distribute_wealth([second_best_players, []])
+            equal_dist = float(total_wealth)/len(best_players)
+            players_to_remove = []
+            count = 0
+            # Distribute wealth to players with small side_pots
+            for hand in best_hands:
+                player = hands_dict[hand]
+                if player.all_in:
+                    player.side_pot = self.calculate_side_pot(player)
+                        if player.side_pot < equal_dist:
+                        player.money += player.side_pot
+                        self.pot -= player.side_pot
+                        players_to_remove.append(hand)
+                        count += 1
+
+            #Remove players that earned money from best_players
+            for player in players_to_remove:
+                best_hands.remove(player)
+
+            if count > 0:
+                continue
+
             else:
-                gains = get_gains(self.pot, len(best_players))
-                for i in range(len(best_players)):
-                    best_players[i].money += gains
+                if len(best_hands) == 0 and self.pot > 0:
+                    continue
+                else:
+                    gains = get_gains(self.pot, len(best_hands))
+                    for hand in best_hands:
+                        hands_dict[hand].money += gains
+                        pot -= gains
