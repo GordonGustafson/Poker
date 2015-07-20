@@ -81,12 +81,17 @@ class FiveCardHandsTest(unittest.TestCase):
 
 
 
-class SevenCardHandsTest(unittest.TestCase):
+class HoldemHandsTest(unittest.TestCase):
     def assert_value_equals(self, community_string, hand_string, expected_value):
         community = parse_hand(community_string)
         hand      = parse_hand(hand_string)
         value = holdem_hand_value(community, hand)
         self.assertEqual(value, expected_value)
+
+    def assert_comparator_result_equals(self, left_hand_string, right_hand_string, comparator, expected_value):
+        left_hand  = parse_hand(left_hand_string)
+        right_hand = parse_hand(right_hand_string)
+        self.assertEqual( comparator(left_hand, right_hand), expected_value)
 
     def test_hand_values(self):
         self.assert_value_equals("TC 9D 6H 3S 2C", "AC KC", [HandType.HIGH_CARD,       14, 13, 10, 9, 6])
@@ -98,3 +103,15 @@ class SevenCardHandsTest(unittest.TestCase):
         self.assert_value_equals("TC TD TS 9H 9C", "AC AC", [HandType.FULL_HOUSE,      10, 14])
         self.assert_value_equals("TC TD TS 2H 9C", "TH KC", [HandType.FOUR_OF_A_KIND,  10, 13])
         self.assert_value_equals("TC 9C 8C 7C 6C", "AC KC", [HandType.STRAIGHT_FLUSH,  10, 9, 8, 7, 6])
+
+    def test_holdem_hand_comparator(self):
+        comparator = get_holdem_hand_comparator(parse_hand("TC 9C 6C 3S 2H"))
+        self.assert_comparator_result_equals("AS 4D", "KS 5D", comparator, 1)
+        self.assert_comparator_result_equals("2S 4D", "KS 5D", comparator, 1)
+        self.assert_comparator_result_equals("2S 4D", "3D 5D", comparator, -1)
+        self.assert_comparator_result_equals("TS 4D", "3D 2D", comparator, -1)
+        self.assert_comparator_result_equals("TS TD", "3D 2D", comparator, 1)
+        self.assert_comparator_result_equals("TS TD", "4D 5D", comparator, -1)
+        self.assert_comparator_result_equals("7S 8D", "4D 5D", comparator, 1)
+        self.assert_comparator_result_equals("7S 8D", "AC 4C", comparator, -1)
+        self.assert_comparator_result_equals("7C 8C", "AC 4C", comparator, 1)

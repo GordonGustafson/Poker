@@ -132,3 +132,8 @@ def holdem_hand_value(community_cards, hand):
 def compare_holdem_hands(community_cards, left, right):
     return cmp( holdem_hand_value(community_cards, left), holdem_hand_value(community_cards, right) )
 
+
+def get_holdem_hand_comparator(community_cards):
+    """Takes the community cards as an argument and returns a comparator that
+    determines which of two two-card hands is better"""
+    return lambda left, right: compare_holdem_hands(community_cards, left, right)
