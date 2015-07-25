@@ -1,6 +1,3 @@
-import Game
-import Player
-
 def turn(player_name, response):
     player = game.players_dict[player_name]
 

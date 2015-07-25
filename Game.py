@@ -1,8 +1,6 @@
 from Player import Player
 import cards
 
-import copy
-import json
 from collections import deque
 
 SMALL_BLIND = 2
