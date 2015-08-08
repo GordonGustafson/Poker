@@ -3,8 +3,6 @@ import cards
 
 from collections import deque
 
-SMALL_BLIND = 2
-BIG_BLIND = 4
 
 # The closest we can get to an Enum in python 2.7
 class RoundType():
@@ -16,35 +14,104 @@ class RoundType():
 
 class Game:
     def __init__(self, players) :
-        self.players = deque()
-        self.player_dict = {}
-        for new_player in players.keys():
-            p = Player(new_player,
-                       players[new_player]['endpoint'],
-                       int(players[new_player]['money']))
-            self.players.append(p)
-            self.player_dict.update({new_player: p})
+        self.players = deque(players)
+
+    def play(self):
+        self.small_blind = 2
+        self.big_blind = 4
+        # Removing bankrupt players *before* the first hand ensures
+        # that a game with all bankrupt players ends immmediately.
+        self.remove_bankrupt_players()
         self.dealer = self.players[0]
+        while self.more_than_one_player_left_in_game():
+            play_hand():
+            self.remove_bankrupt_players()
+
+    def play_hand(self):
+        self.start_hand()
+        for round_type in [RoundType.PRE_FLOP, RoundType.FLOP, RoundType.TURN, RoundType.RIVER]:
+            if self.more_than_one_player_left_in_hand():
+                self.play_round(round_type)
+            else:
+                break;
+
+        # TODO: implement this using stuff from cards.py
+        self.distribute_wealth(self.evaluate_hands())
+
+    def play_round(self, round_type)
+        def round_is_over():
+            return all(lambda player: player.has_had_chance_to_act) \
+                and utils.all_equal(player.in_pot_this_round for player in self.players)
+
+        self.start_round(round_type)
+
+        while not round_is_over():
+            player_turn(self.players[0])
+            self.players.rotate(-1)
 
 
-    def new_hand(self):
+    def player_turn(self, player):
+        def get_gamestate(self, player):
+            """Returns the current game state to a specific player"""
+            return {'pot':self.pot,
+                    'board':self.board,
+                    'players': [player.name for player in self.players],
+                    'hand': player.hand,
+                    'money': player.money,
+                    'dealer':self.dealer.name,
+                    'past_moves':self.round_moves}
+
+        move = player.get_move(get_gamestate(player))
+        self.handle_move(player, move)
+
+
+    def handle_move(self, player, move):
+
+        if player.money == 0:
+            # TODO: consider what should happen if this case occurs
+            raise Exception("Found bankrupt player during the game")
+
+        # amount required to call
+        minimum_bet = self.bet - player.in_pot_this_round
+        player_bet = move["bet"]
+        did_not_bet_minimum_when_able_to = player_bet < minimum_bet < player.money
+        bet_more_than_they_have = player_bet > player.money
+        made_illegal_bet = did_not_bet_minimum_when_able_to or bet_more_than_they_have
+        if move["folded"] or made_illegal_bet:
+            player.has_folded = True
+        else:
+            player.money -= player_bet
+            self.pot += player_bet
+            player.in_pot_this_round += player_bet
+            player.in_pot_total += player_bet
+
+            if player.money == 0:
+                player.all_in = True
+
+            # TODO: figure out how self.bet works
+            self.bet = player.in_pot_this_round + player_bet
+
+        self.hand_moves.append(move)
+        self.round_moves.append(move)
+
+
+    def start_hand(self):
         self.pot = 0
         self.board = []
         self.deck = cards.new_shuffled_deck()
         self.hand_moves = []
         self.round_moves = []
         self.bet = 0
-        self.last_player = None
 
-        #turning all folded players to False. Giving each player two cards
         for player in self.players:
-            player.in_pot = 0
-            player.total_in_pot = 0
+            player.in_pot_this_round = 0
+            player.in_pot_total = 0
             player.has_folded = False
             player.hand = self.deck[0:2] # give the player the 'top' two cards
             self.deck   = self.deck[2:]  # the remaining cards form the new deck
 
-        #cycling through players to find the dealer
+        # cycling through players to find the dealer
+        # make this a method, it is used multiple times
         while self.dealer != self.players[0]:
             self.players.rotate(-1)
 
@@ -53,35 +120,18 @@ class Game:
         self.dealer = self.players[0]
 
         #small blind/big blind handling
-        for blind in [SMALL_BLIND, BIG_BLIND]:
+        for blind in [self.small_blind, self.big_blind]:
             self.players.rotate(-1)
-            current_player = self.players[0]
-            if current_player.money < blind:
-                current_player.in_pot += current_player.money
-                current_player.all_in = True
-                self.pot += current_player.money
-                bet = current_player.money
-                current_player.money = 0
-            else:
-                current_player.in_pot += blind
-                bet = blind
-                self.pot += blind
-                current_player.money -= blind
+            # TODO: replace this with the betting abstraction
+            handle_move(self.players[0], {"bet": blind})
+            # posting a blind doesn't count as a chance to act (blinds can still raise later)
+            self.players[0].has_had_chance_to_act = False
 
-            #storing the changes to big/small blind
-            to_append = {'name':current_player.name,'folded':False,'bet':bet}
-            self.hand_moves.append(to_append)
-            self.round_moves.append(to_append)
-
-        #setting the bet.
-        self.bet = BIG_BLIND
-
-        #pointing the queue to the player after the bigblind and assigning to last_player
+        #pointing the queue to the player after the big blind
         self.players.rotate(-1)
-        self.last_player = self.players[0]
 
 
-    def round_start(self, round_type):
+    def start_round(self, round_type):
         """Adds cards to the board depending on the round being played.
         Also, re-orders the queue for next round
         """
@@ -98,58 +148,17 @@ class Game:
 
         if round_type != RoundType.PRE_FLOP:
             for player in self.players:
-                player.total_in_pot += player.in_pot
-                player.in_pot = 0
+                player.in_pot_total += player.in_pot_this_round
+                player.in_pot_this_round = 0
 
             while self.dealer != self.players[0]:
                 self.players.rotate(-1)
 
             #point the queue to the small blind.
             self.players.rotate(-1)
-            self.last_player = self.players[0]
-
-
-    def get_gamestate(self, player):
-        """Returns the current game state to a specific player"""
-
-        gamestate = {'pot':self.pot,
-            'board':self.board,
-            'players': [player.name for player in self.players],
-            'hand': player.hand,
-            'money': player.money,
-            'dealer':self.dealer.name,
-            'past_moves':self.round_moves}
-        return gamestate
-
-
-    def last_man_standing(self):
-        """Updates the player queue to remove bankrupt players before hand begins and returns True
-        if and only if only one player is left with money.
-        """
-        players_to_remove = [player for player in self.players if player.money <= 0]
-        for bankrupt_player in players_to_remove:
-            self.players.remove(bankrupt_player)
-        return len(self.players) <= 1
-
-
-    def active_hand(self):
-        """Returns True if and only if more than one person didn't fold."""
-        return sum(1 for player in self.players if not player.has_folded) > 1
 
 
 
-    def calculate_side_pot(self, player):
-        sidepot = 0
-        for p in self.players:
-            sidepot += min(p.total_in_pot, player.total_in_pot)
-
-        return sidepot
-
-
-    """
-        Distributes the pot among the players according to their side_pot values and how
-        good their hand is.
-    """
     def distribute_wealth(self):
         """Distributes the pot among the players according to their side_pot
         values and how good their hand is.
@@ -164,7 +173,14 @@ class Game:
                 gains[i] += 1
             return gains
 
-	player_list = [player for player in self.players]
+        def calculate_side_pot(player):
+            sidepot = 0
+            for p in self.players:
+                sidepot += min(p.in_pot_total, player.in_pot_total)
+
+            return sidepot
+
+        player_list = list(self.players)
 
         while self.pot > 0:
             best_players = cards.players_with_best_holdem_hands(self.board, player_list)
@@ -175,7 +191,7 @@ class Game:
             # Distribute wealth to players with small side_pots
             for player in best_players:
                 if player.all_in:
-                    player.side_pot = self.calculate_side_pot(player)
+                    player.side_pot = calculate_side_pot(player)
                     if player.side_pot < equal_dist:
                         player.money += player.side_pot
                         self.pot -= player.side_pot
@@ -197,3 +213,16 @@ class Game:
                     for i in range(len(best_players)):
                         best_players[i].money += gains[i]
                         self.pot -= gains[i]
+
+
+
+    def remove_bankrupt_players(self):
+        """Removes bankrupt players from the player queue"""
+        self.players = deque(player for player in self.players if player.money > 0)
+
+    def more_than_one_player_left_in_game(self):
+        return len(self.players) > 1
+
+    def more_than_one_player_left_in_hand(self):
+        """Returns True if and only if more than one person didn't fold."""
+        return len(player for player in self.players if not player.has_folded) > 1

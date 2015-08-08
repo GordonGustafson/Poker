@@ -1,3 +1,5 @@
+import utils
+
 import itertools
 import random
 import collections
@@ -54,21 +56,13 @@ class HandType():
     FOUR_OF_A_KIND = 8
     STRAIGHT_FLUSH = 9
 
-def all_same_value(lst):
-    if not lst:
-        # there are no elements in the list, so all elements are the same value
-        return True
-    # return whether the number of occurrences of the first element
-    # are equal to the number of elements in the list.
-    return lst.count(lst[0]) == len(lst)
-
 
 # Return a comparable list that represents the strength of a hand
 def five_card_hand_value(hand):
     suits = [card["suit"] for card in hand]
     ranks = [card["rank"] for card in hand]
 
-    is_flush = all_same_value(suits)
+    is_flush = utils.all_equal(suits)
 
     descending_ranks = sorted(ranks, reverse=True)
     descending_ranks_relative_to_minimum_rank = [rank - min(ranks) for rank in descending_ranks]
