@@ -11,14 +11,16 @@ class RoundType():
     TURN = object()
     RIVER = object()
 
+INITIAL_SMALL_BLIND = 2
+INITIAL_BIG_BLIND = 4
 
 class Game:
     def __init__(self, players) :
         self.players = deque(players)
 
     def play(self):
-        self.small_blind = 2
-        self.big_blind = 4
+        self.small_blind = INITIAL_SMALL_BLIND
+        self.big_blind   = INITIAL_BIG_BLIND
         # Removing bankrupt players *before* the first hand ensures
         # that a game with all bankrupt players ends immmediately.
         self.remove_bankrupt_players()
