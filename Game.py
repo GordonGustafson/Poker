@@ -26,7 +26,7 @@ class Game:
         self.remove_bankrupt_players()
         self.dealer = self.players[0]
         while self.more_than_one_player_left_in_game():
-            play_hand():
+            self.play_hand()
             self.remove_bankrupt_players()
 
     def play_hand(self):
@@ -35,12 +35,12 @@ class Game:
             if self.more_than_one_player_left_in_hand():
                 self.play_round(round_type)
             else:
-                break;
+                break
 
         # TODO: implement this using stuff from cards.py
         self.distribute_wealth(self.evaluate_hands())
 
-    def play_round(self, round_type)
+    def play_round(self, round_type):
         def round_is_over():
             return all(lambda player: player.has_had_chance_to_act) \
                 and utils.all_equal(player.in_pot_this_round for player in self.players)
@@ -48,7 +48,7 @@ class Game:
         self.start_round(round_type)
 
         while not round_is_over():
-            player_turn(self.players[0])
+            self.player_turn(self.players[0])
             self.players.rotate(-1)
 
 
