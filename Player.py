@@ -1,26 +1,22 @@
 class Player:
-    def __init__(self, name, endpoint, money):
-        self.name = name
-        self.endpoint = endpoint
-        self.money = money
+    def __init__(self, name, money):
+        self.name = name            # string identifying the player
+        self.money = money          # money currently held
+        self.hole_cards = None      # List of hole cards currently held
+        self.has_folded = False     # whether player has folded this hand
+        self.has_had_turn = False   # whether player has had a turn this hand
+        self.in_pot_this_round = 0  # money player has put in pot this round
+
+    def start_hand(self, new_hole_cards):
+        self.hole_cards = new_hole_cards
         self.has_folded = False
-        self.has_had_chance_to_act = False
-        self.hand = None
-        self.side_pot = 0
-        self.all_in = False
+        self.has_had_turn = False
         self.in_pot_this_round = 0
-        self.in_pot_total = 0
 
+    def start_round(self):
+        self.has_had_turn = False
+        self.in_pot_this_round = 0
 
-    def get_move(self, gamestate):
-        headers = {"content-type": "application/json"}
-        r = requests.post(self.endpoint, data=json.dumps(gamestate), headers=headers)
-        if r.headers['Content-Type'] != 'application/json':
-            return {'name': self.name, 'fold': True, 'bet':0}
-        else:
-            move = r.json()
-            # While the Game knows what player this move was for, we record
-            # the player's name so that other bots will see it in the game's
-            # list of past moves.
-            move['name'] = self.name
-            return move
+    def is_bankrupt(self):
+        # TODO: consider how to handle negative money
+        return self.money <= 0

@@ -4,9 +4,13 @@ import itertools
 import random
 import collections
 
-# A card is a dictionary with a key "suit" with value
 SUITS = ["C", "D", "H", "S"]
-RANKS = range(2, 15)            # 2 through 14
+RANKS = range(2, 15)  # 2 through 14
+
+Card = collections.namedtuple("Card",
+    ["suit",  # element of SUITS
+     "rank",  # element of RANKS
+    ])
 
 CHAR_TO_RANK = {
     "2" : 2,
@@ -29,7 +33,7 @@ def parse_card(card_string):
     rank_char = card_string[0]
     rank = CHAR_TO_RANK[rank_char]
     suit = card_string[1]
-    return {"suit": suit, "rank": rank}
+    return Card(suit=suit, rank=rank)
 
 def parse_hand(hand_string):
     card_strings = hand_string.split()
@@ -40,7 +44,7 @@ def parse_hand(hand_string):
 
 def new_shuffled_deck():
     unshuffled_pairs = itertools.product(SUITS, RANKS)
-    deck = [{"suit": pair[0], "rank": pair[1]} for pair in unshuffled_pairs]
+    deck = [Card(suit=pair[0], rank=pair[1]) for pair in unshuffled_pairs]
     random.shuffle(deck)
     return deck
 
@@ -59,8 +63,8 @@ class HandType():
 
 # Return a comparable list that represents the strength of a hand
 def five_card_hand_value(hand):
-    suits = [card["suit"] for card in hand]
-    ranks = [card["rank"] for card in hand]
+    suits = [card.suit for card in hand]
+    ranks = [card.rank for card in hand]
 
     is_flush = utils.all_equal(suits)
 
@@ -112,7 +116,7 @@ def five_card_hand_value(hand):
 
 # return a negative, zero or positive number depending on whether left is considered smaller than, equal to, or larger than the second argument:
 def compare_five_card_hands(left, right):
-    return cmp( five_card_hand_value(left), five_card_hand_value(right) )
+    return utils.cmp( five_card_hand_value(left), five_card_hand_value(right) )
 
 
 def holdem_hand_value(community_cards, hand):
@@ -124,7 +128,7 @@ def holdem_hand_value(community_cards, hand):
 
 
 def compare_holdem_hands(community_cards, left, right):
-    return cmp( holdem_hand_value(community_cards, left), holdem_hand_value(community_cards, right) )
+    return utils.cmp( holdem_hand_value(community_cards, left), holdem_hand_value(community_cards, right) )
 
 
 def get_holdem_hand_comparator(community_cards):
@@ -142,6 +146,6 @@ def best_holdem_hands(community_cards, hands):
 
 def players_with_best_holdem_hands(community_cards, players):
     """Returns all the players that will split the pot"""
-    winning_player = max(players, key=lambda player: holdem_hand_value(community_cards, player.hand))
+    winning_player = max(players, key=lambda player: holdem_hand_value(community_cards, player.hole_cards))
     comparator = get_holdem_hand_comparator(community_cards)
-    return [player for player in players if comparator(player.hand, winning_player.hand) == 0]
+    return [player for player in players if comparator(player.hole_cards, winning_player.hole_cards) == 0]

@@ -5,7 +5,7 @@ app = Flask(__name__)
 def bot():
     data = request.get_json()
     bet = data["past_moves"][-1]["bet"]
-    print bet
+    print(bet)
     return jsonify(name="TestBot", folded=False, bet=4)
 
 if __name__ == "__main__":
