@@ -40,32 +40,39 @@ class Game:
         # TODO: implement this using stuff from cards.py
         self.distribute_wealth(self.evaluate_hands())
 
-    def play_round(self, round_type):
-        def round_is_over():
-            return all(lambda player: player.has_had_chance_to_act) \
-                and utils.all_equal(player.in_pot_this_round for player in self.players)
+    def all_players_met_highest_bet_or_folded(self):
+        largest_in_pot_total = max(player.in_pot_total for player in self.players)
+        return all(player.in_pot_total == largest_in_pot_total
+                   or player.has_folded
+                    for player in self.players)
 
+    def play_round(self, round_type):
         self.start_round(round_type)
 
-        while not round_is_over():
+        num_active_players = len(player for player in self.players
+                                 if not player.has_folded
+                                 and player.money > 0)
+        for _ in range(0, num_active_players):
             self.player_turn(self.players[0])
             self.players.rotate(-1)
 
+        while not self.all_players_met_highest_bet_or_folded():
+            self.player_turn(self.players[0])
+            self.players.rotate(-1)
+
+    def get_gamestate(self, player):
+        """Returns the current game state to a specific player"""
+        return {'pot':self.pot,
+                'board':self.board,
+                'players': [player.name for player in self.players],
+                'hand': player.hand,
+                'money': player.money,
+                'dealer':self.dealer.name,
+                'past_moves':self.round_moves}
 
     def player_turn(self, player):
-        def get_gamestate(self, player):
-            """Returns the current game state to a specific player"""
-            return {'pot':self.pot,
-                    'board':self.board,
-                    'players': [player.name for player in self.players],
-                    'hand': player.hand,
-                    'money': player.money,
-                    'dealer':self.dealer.name,
-                    'past_moves':self.round_moves}
-
-        move = player.get_move(get_gamestate(player))
+        move = player.get_move(self.get_gamestate(player))
         self.handle_move(player, move)
-
 
     def handle_move(self, player, move):
 
@@ -86,9 +93,6 @@ class Game:
             self.pot += player_bet
             player.in_pot_this_round += player_bet
             player.in_pot_total += player_bet
-
-            if player.money == 0:
-                player.all_in = True
 
             # TODO: figure out how self.bet works
             self.bet = player.in_pot_this_round + player_bet
@@ -126,8 +130,6 @@ class Game:
             self.players.rotate(-1)
             # TODO: replace this with the betting abstraction
             handle_move(self.players[0], {"bet": blind})
-            # posting a blind doesn't count as a chance to act (blinds can still raise later)
-            self.players[0].has_had_chance_to_act = False
 
         #pointing the queue to the player after the big blind
         self.players.rotate(-1)
@@ -192,7 +194,7 @@ class Game:
             count = 0
             # Distribute wealth to players with small side_pots
             for player in best_players:
-                if player.all_in:
+                if player.money == 0:
                     player.side_pot = calculate_side_pot(player)
                     if player.side_pot < equal_dist:
                         player.money += player.side_pot

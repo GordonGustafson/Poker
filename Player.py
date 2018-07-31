@@ -4,12 +4,12 @@ class Player:
         self.endpoint = endpoint
         self.money = money
         self.has_folded = False
-        self.has_had_chance_to_act = False
         self.hand = None
-        self.side_pot = 0
-        self.all_in = False
-        self.in_pot_this_round = 0
         self.in_pot_total = 0
+
+        # TODO: eliminate these? I think they're all redundant or better stored elsewhere.
+        self.side_pot = 0
+        self.in_pot_this_round = 0
 
 
     def get_move(self, gamestate):
