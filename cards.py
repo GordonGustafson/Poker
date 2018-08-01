@@ -138,10 +138,3 @@ def best_holdem_hands(community_cards, hands):
     winning_hand = max(hands, key=lambda hand: holdem_hand_value(community_cards, hand))
     comparator = get_holdem_hand_comparator(community_cards)
     return [hand for hand in hands if comparator(hand, winning_hand) == 0]
-
-
-def players_with_best_holdem_hands(community_cards, players):
-    """Returns all the players that will split the pot"""
-    winning_player = max(players, key=lambda player: holdem_hand_value(community_cards, player.hand))
-    comparator = get_holdem_hand_comparator(community_cards)
-    return [player for player in players if comparator(player.hand, winning_player.hand) == 0]

@@ -7,10 +7,6 @@ class Player:
         self.hand = None
         self.in_pot_total = 0
 
-        # TODO: eliminate these? I think they're all redundant or better stored elsewhere.
-        self.side_pot = 0
-        self.in_pot_this_round = 0
-
 
     def get_move(self, gamestate):
         headers = {"content-type": "application/json"}
