@@ -14,3 +14,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     game = Game(args.players)
     game.play_until_single_winner()
+    print game.players

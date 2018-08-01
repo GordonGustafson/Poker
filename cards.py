@@ -4,7 +4,8 @@ import itertools
 import random
 import collections
 
-# A card is a dictionary with a key "suit" with value
+# A card is a dictionary with "suit" and "rank" keys having the following
+# possible values:
 SUITS = ["C", "D", "H", "S"]
 RANKS = range(2, 15)            # 2 through 14
 

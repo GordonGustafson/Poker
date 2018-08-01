@@ -19,6 +19,7 @@ class Game:
         self.players = deque(players)
 
     def play_until_single_winner(self):
+        # TODO: implement increasing blinds
         self.small_blind = INITIAL_SMALL_BLIND
         self.big_blind   = INITIAL_BIG_BLIND
         # Removing bankrupt players *before* the first hand ensures
@@ -57,8 +58,10 @@ class Game:
             self.players.rotate(-1)
 
         while not self.all_players_met_highest_bet_or_folded():
-            self.player_turn(self.players[0])
-            self.players.rotate(-1)
+            if (not self.players[0].has_folded
+                and self.players[0].money > 0):
+                self.player_turn(self.players[0])
+                self.players.rotate(-1)
 
     def get_gamestate(self, player):
         """Returns the current game state to a specific player"""
@@ -76,14 +79,10 @@ class Game:
         self.handle_move(player, move)
 
     def handle_move(self, player, move):
-
-        if player.money == 0:
-            # TODO: consider what should happen if this case occurs
-            raise Exception("Found bankrupt player during the game")
-
         # amount required to call
         minimum_bet = (max(player.in_pot_total for player in self.players)
                        - player.in_pot_total)
+        # TODO: require that bet is a multiple of big blind?
         player_bet = move["bet"]
         did_not_bet_minimum_when_able_to = player_bet < minimum_bet < player.money
         bet_more_than_they_have = player_bet > player.money
@@ -94,13 +93,13 @@ class Game:
             player.money -= player_bet
             player.in_pot_total += player_bet
 
-        self.hand_moves.append(move)
         self.round_moves.append(move)
 
     def start_hand(self):
         self.board = []
         self.deck = cards.new_shuffled_deck()
-        self.hand_moves = []
+        # TODO: make it easier to figure out what's going on by looking at this
+        # variable (include round boundaries for example)
         self.round_moves = []
 
         for player in self.players:
@@ -109,20 +108,21 @@ class Game:
             player.hand = self.deck[0:2] # give the player the 'top' two cards
             self.deck   = self.deck[2:]  # the remaining cards form the new deck
 
-        # cycling through players to find the dealer
+        # Cycle through players to find the dealer.
         # make this a method, it is used multiple times
         while self.dealer != self.players[0]:
             self.players.rotate(-1)
 
-        #setting the dealer to the player after the previous dealer
+        # Set the dealer to the player after the previous dealer.
+        # NOTE: this doesn't have a special case for the first hand, so it skips
+        # the first dealer.
         self.players.rotate(-1)
         self.dealer = self.players[0]
 
         #small blind/big blind handling
         for blind in [self.small_blind, self.big_blind]:
             self.players.rotate(-1)
-            # TODO: replace this with the betting abstraction
-            handle_move(self.players[0], {"bet": blind})
+            handle_move({'name': self.players[0].name, 'bet': blind})
 
         #pointing the queue to the player after the big blind
         self.players.rotate(-1)
